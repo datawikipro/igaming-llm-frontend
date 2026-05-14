@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: igaming-llm-frontend
+  namespace: igaming-llm
+  labels:
+    app: igaming-llm-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: igaming-llm-frontend
+  template:
+    metadata:
+      labels:
+        app: igaming-llm-frontend
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: llm-frontend
+        image: ghcr.io/datawikipro/igaming-llm-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: BACKEND_URL
+          value: "http://igaming-llm-admin"
+        - name: HOSTNAME
+          value: "0.0.0.0"
+      nodeSelector:
+        node-type: main
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: igaming-llm-frontend
+  namespace: igaming-llm
+spec:
+  selector:
+    app: igaming-llm-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: ClusterIP
