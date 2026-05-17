@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNodes } from './useNodes';
 import { useProviders } from './useProviders';
 import { useModels } from './useModels';
+import { useQueueStats } from './useQueueStats';
 
 export function useLlmApi() {
   const [refreshing, setRefreshing] = useState(false);
@@ -21,7 +22,10 @@ export function useLlmApi() {
     fetchProviders,
     fetchSupportedProviders,
     saveProvider,
-    deleteProvider
+    deleteProvider,
+    fetchKeys,
+    addKey,
+    deleteKey
   } = useProviders();
 
   const {
@@ -31,16 +35,23 @@ export function useLlmApi() {
     deleteModel
   } = useModels();
 
+  const {
+    stats: queueStats,
+    loading: queueStatsLoading,
+    fetchStats: fetchQueueStats
+  } = useQueueStats();
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
       fetchNodes(),
       fetchProviders(),
       fetchModels(),
-      fetchSupportedProviders()
+      fetchSupportedProviders(),
+      fetchQueueStats()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats]);
 
   return {
     nodes,
@@ -60,6 +71,12 @@ export function useLlmApi() {
     saveProvider,
     deleteProvider,
     saveModel,
-    deleteModel
+    deleteModel,
+    fetchKeys,
+    addKey,
+    deleteKey,
+    queueStats,
+    queueStatsLoading,
+    fetchQueueStats
   };
 }

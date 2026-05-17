@@ -16,11 +16,20 @@ export interface LlmGatewayNode {
   lastRequestTime: string | null;
 }
 
+export interface LlmProviderKey {
+  id?: number;
+  label: string;
+  apiKey: string;
+  active: boolean;
+  createdAt?: string;
+}
+
 export interface LlmProvider {
   id: number;
   name: string;
   displayName: string;
   active: boolean;
+  keys?: LlmProviderKey[];
 }
 
 export interface LlmModel {

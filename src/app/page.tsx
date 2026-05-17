@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, RotateCw, LayoutDashboard, Database, Cpu } from "lucide-react";
+import { Plus, RotateCw, LayoutDashboard, Database, Cpu, Activity } from "lucide-react";
 import { useLlmApi } from "../hooks/useLlmApi";
 import { StatsGrid } from "../components/StatsGrid";
 import { NodesTable } from "../components/NodesTable";
 import { RegisterNodeModal } from "../components/RegisterNodeModal";
 import { ProvidersTable } from "../components/ProvidersTable";
 import { ModelsTable } from "../components/ModelsTable";
+import { QueueStatsView } from "../components/QueueStatsView";
 
-type TabType = "nodes" | "providers" | "models";
+type TabType = "nodes" | "providers" | "models" | "queue";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("nodes");
@@ -33,7 +34,13 @@ export default function Home() {
     saveProvider,
     deleteProvider,
     saveModel,
-    deleteModel
+    deleteModel,
+    fetchKeys,
+    addKey,
+    deleteKey,
+    queueStats,
+    queueStatsLoading,
+    fetchQueueStats
   } = useLlmApi();
 
   useEffect(() => {
@@ -41,11 +48,15 @@ export default function Home() {
     fetchProviders();
     fetchModels();
     fetchSupportedProviders();
+    fetchQueueStats();
     
-    // Poll nodes status every 10 seconds
-    const interval = setInterval(fetchNodes, 10000);
+    // Poll nodes status & queue every 10 seconds
+    const interval = setInterval(() => {
+      fetchNodes();
+      fetchQueueStats();
+    }, 10000);
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats]);
 
   return (
     <main className="dashboard-container">
@@ -90,6 +101,13 @@ export default function Home() {
           <Cpu size={18} />
           Models
         </button>
+        <button 
+          className={`tab-btn ${activeTab === "queue" ? "active" : ""}`}
+          onClick={() => setActiveTab("queue")}
+        >
+          <Activity size={18} />
+          Gateway Queue
+        </button>
       </div>
 
       {activeTab === "nodes" && (
@@ -112,6 +130,9 @@ export default function Home() {
           loading={loading} 
           onSave={saveProvider} 
           onDelete={deleteProvider} 
+          fetchKeys={fetchKeys}
+          addKey={addKey}
+          deleteKey={deleteKey}
         />
       )}
 
@@ -123,6 +144,14 @@ export default function Home() {
           loading={loading} 
           onSave={saveModel} 
           onDelete={deleteModel} 
+        />
+      )}
+
+      {activeTab === "queue" && (
+        <QueueStatsView 
+          stats={queueStats} 
+          loading={queueStatsLoading} 
+          onRefresh={fetchQueueStats} 
         />
       )}
 

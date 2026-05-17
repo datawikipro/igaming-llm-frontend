@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Database, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { LlmProvider, SupportedProviderConfig } from '../types';
+import { Database, Plus, Trash2, Edit2, Check, X, Key } from 'lucide-react';
+import { LlmProvider, SupportedProviderConfig, LlmProviderKey } from '../types';
+import { ProviderKeysManager } from './ProviderKeysManager';
 
 interface ProvidersTableProps {
   providers: LlmProvider[];
@@ -8,15 +9,22 @@ interface ProvidersTableProps {
   loading: boolean;
   onSave: (provider: Partial<LlmProvider>) => Promise<boolean>;
   onDelete: (id: number) => Promise<boolean>;
+  fetchKeys: (providerId: number) => Promise<LlmProviderKey[]>;
+  addKey: (providerId: number, key: Partial<LlmProviderKey>) => Promise<boolean>;
+  deleteKey: (keyId: number) => Promise<boolean>;
 }
 
 export const ProvidersTable: React.FC<ProvidersTableProps> = ({ 
-  providers, supportedProviders = [], loading, onSave, onDelete 
+  providers, supportedProviders = [], loading, onSave, onDelete,
+  fetchKeys, addKey, deleteKey
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editDisplayName, setEditDisplayName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+
+  // API Keys state
+  const [expandedProviderId, setExpandedProviderId] = useState<number | null>(null);
 
   const handleEdit = (p: LlmProvider) => {
     setEditingId(p.id);
@@ -32,6 +40,10 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
       setEditName("");
       setEditDisplayName("");
     }
+  };
+
+  const toggleExpand = (providerId: number) => {
+    setExpandedProviderId(expandedProviderId === providerId ? null : providerId);
   };
 
   return (
@@ -91,7 +103,8 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
               </tr>
             )}
             {providers.map(p => (
-              <tr key={p.id}>
+              <React.Fragment key={p.id}>
+                <tr key={p.id}>
                 <td style={{ color: "#64748b" }}>#{p.id}</td>
                 {editingId === p.id ? (
                   <>
@@ -134,6 +147,13 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
                       </>
                     ) : (
                       <>
+                        <button 
+                          className={`btn btn-action ${expandedProviderId === p.id ? 'btn-reset' : ''}`} 
+                          onClick={() => toggleExpand(p.id)}
+                          title="Manage API Keys"
+                        >
+                          <Key size={12} />
+                        </button>
                         <button className="btn btn-action" onClick={() => handleEdit(p)}><Edit2 size={12} /></button>
                         <button className="btn btn-action btn-delete" onClick={() => onDelete(p.id)}><Trash2 size={12} /></button>
                       </>
@@ -141,6 +161,19 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
                   </div>
                 </td>
               </tr>
+              {expandedProviderId === p.id && (
+                <tr className="keys-expanded-row">
+                  <td colSpan={5} style={{ padding: '1rem 2rem', backgroundColor: 'rgba(255, 255, 255, 0.02)' }}>
+                    <ProviderKeysManager 
+                      providerId={p.id}
+                      fetchKeys={fetchKeys}
+                      addKey={addKey}
+                      deleteKey={deleteKey}
+                    />
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
             ))}
           </tbody>
         </table>

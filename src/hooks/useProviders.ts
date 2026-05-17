@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LlmProvider, SupportedProviderConfig } from '../types';
+import { LlmProvider, SupportedProviderConfig, LlmProviderKey } from '../types';
 import { apiFetch } from '../utils/api';
 
 export function useProviders() {
@@ -49,12 +49,36 @@ export function useProviders() {
     return false;
   };
 
+  const fetchKeys = useCallback(async (providerId: number) => {
+    const data = await apiFetch<LlmProviderKey[]>(`/api/v1/admin/providers/${providerId}/keys`);
+    return data || [];
+  }, []);
+
+  const addKey = async (providerId: number, key: Partial<LlmProviderKey>) => {
+    const data = await apiFetch<LlmProviderKey>(`/api/v1/admin/providers/${providerId}/keys`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...key, active: true })
+    });
+    return data !== null;
+  };
+
+  const deleteKey = async (keyId: number) => {
+    const data = await apiFetch<any>(`/api/v1/admin/providers/keys/${keyId}`, {
+      method: "DELETE"
+    });
+    return data !== null;
+  };
+
   return {
     providers,
     supportedProviders,
     fetchProviders,
     fetchSupportedProviders,
     saveProvider,
-    deleteProvider
+    deleteProvider,
+    fetchKeys,
+    addKey,
+    deleteKey
   };
 }
