@@ -56,11 +56,13 @@ export const NodesTable: React.FC<NodesTableProps> = ({
                   <td style={{ fontWeight: 700, color: "white" }}>{node.name}</td>
                   <td>
                     <span className="status-badge" style={{ background: "rgba(168, 85, 247, 0.15)", color: "#c084fc" }}>
-                      {node.providerType}
+                      {node.model?.provider?.displayName || node.model?.provider?.name || node.providerType || '—'}
                     </span>
                   </td>
                   <td>
-                    <span className="badge-model">{node.modelName}</span>
+                    <span className="badge-model">
+                      {node.model?.displayName || node.model?.modelId || node.modelName || '—'}
+                    </span>
                   </td>
                   <td style={{ fontFamily: "monospace", fontSize: "0.8rem", color: "#94a3b8" }}>
                     {node.endpointUrl}

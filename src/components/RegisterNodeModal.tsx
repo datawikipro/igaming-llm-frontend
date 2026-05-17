@@ -72,12 +72,15 @@ export const RegisterNodeModal: React.FC<RegisterNodeModalProps> = ({ onClose, c
       }
     }
 
+    const selectedModel = models.find(m => m.modelId === modelName);
+
     const payload: LlmGatewayNode = {
       name: parsedName,
       endpointUrl: parsedEndpoint,
       providerType: providerType,
       modelName,
       apiKey: jsonConfig,
+      model: selectedModel,
       active: true,
       status: "HEALTHY",
       suspendedUntil: null,

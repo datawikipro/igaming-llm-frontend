@@ -2,9 +2,10 @@ export interface LlmGatewayNode {
   id?: number;
   name: string;
   endpointUrl: string;
-  providerType: string;
-  modelName: string;
-  apiKey: string;
+  providerType?: string;
+  modelName?: string;
+  apiKey?: string;
+  model?: LlmModel;
   active: boolean;
   status: 'HEALTHY' | 'DOWN' | 'EXHAUSTED';
   suspendedUntil: string | null;
