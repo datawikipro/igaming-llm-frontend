@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { LlmGatewayNode, LlmProvider, LlmModel, SupportedProviderConfig } from '../types';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:62001";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export function useLlmApi() {
   const [nodes, setNodes] = useState<LlmGatewayNode[]>([]);
