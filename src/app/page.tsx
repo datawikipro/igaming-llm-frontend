@@ -19,11 +19,13 @@ export default function Home() {
     nodes,
     providers,
     models,
+    supportedProviders,
     loading,
     refreshing,
     fetchNodes,
     fetchProviders,
     fetchModels,
+    fetchSupportedProviders,
     handleRefresh,
     createNode,
     deleteNode,
@@ -38,11 +40,12 @@ export default function Home() {
     fetchNodes();
     fetchProviders();
     fetchModels();
+    fetchSupportedProviders();
     
     // Poll nodes status every 10 seconds
     const interval = setInterval(fetchNodes, 10000);
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchProviders, fetchModels]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders]);
 
   return (
     <main className="dashboard-container">
@@ -105,6 +108,7 @@ export default function Home() {
       {activeTab === "providers" && (
         <ProvidersTable 
           providers={providers} 
+          supportedProviders={supportedProviders}
           loading={loading} 
           onSave={saveProvider} 
           onDelete={deleteProvider} 
@@ -115,6 +119,7 @@ export default function Home() {
         <ModelsTable 
           models={models} 
           providers={providers}
+          supportedProviders={supportedProviders}
           loading={loading} 
           onSave={saveModel} 
           onDelete={deleteModel} 

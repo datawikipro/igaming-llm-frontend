@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Cpu, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { LlmModel, LlmProvider } from '../types';
+import { LlmModel, LlmProvider, SupportedProviderConfig } from '../types';
 
 interface ModelsTableProps {
   models: LlmModel[];
   providers: LlmProvider[];
+  supportedProviders?: SupportedProviderConfig[];
   loading: boolean;
   onSave: (model: Partial<LlmModel>, providerId: number) => Promise<boolean>;
   onDelete: (id: number) => Promise<boolean>;
 }
 
 export const ModelsTable: React.FC<ModelsTableProps> = ({ 
-  models, providers, loading, onSave, onDelete 
+  models, providers, supportedProviders = [], loading, onSave, onDelete 
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editModelId, setEditModelId] = useState("");
@@ -37,6 +38,11 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
       setEditModelId("");
       setEditDisplayName("");
     }
+  };
+
+  const getAvailableModels = (providerId?: number) => {
+    const p = providers.find(p => p.id === providerId);
+    return supportedProviders.find(sp => sp.name === p?.name)?.models || [];
   };
 
   return (
@@ -73,7 +79,18 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
                   </select>
                 </td>
                 <td>
-                  <input className="form-control sm" value={editModelId} onChange={e => setEditModelId(e.target.value)} placeholder="e.g. gpt-4" />
+                  <input 
+                    className="form-control sm" 
+                    value={editModelId} 
+                    onChange={e => setEditModelId(e.target.value)} 
+                    placeholder="e.g. gpt-4" 
+                    list="new-model-list"
+                  />
+                  <datalist id="new-model-list">
+                    {getAvailableModels(selectedProviderId).map(m => (
+                      <option key={m} value={m} />
+                    ))}
+                  </datalist>
                 </td>
                 <td>
                   <input className="form-control sm" value={editDisplayName} onChange={e => setEditDisplayName(e.target.value)} placeholder="e.g. GPT-4 Turbo" />
@@ -97,7 +114,19 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
                 </td>
                 {editingId === m.id ? (
                   <>
-                    <td><input className="form-control sm" value={editModelId} onChange={e => setEditModelId(e.target.value)} /></td>
+                    <td>
+                      <input 
+                        className="form-control sm" 
+                        value={editModelId} 
+                        onChange={e => setEditModelId(e.target.value)} 
+                        list={`edit-model-list-${m.id}`}
+                      />
+                      <datalist id={`edit-model-list-${m.id}`}>
+                        {getAvailableModels(m.provider?.id).map(mod => (
+                          <option key={mod} value={mod} />
+                        ))}
+                      </datalist>
+                    </td>
                     <td><input className="form-control sm" value={editDisplayName} onChange={e => setEditDisplayName(e.target.value)} /></td>
                   </>
                 ) : (

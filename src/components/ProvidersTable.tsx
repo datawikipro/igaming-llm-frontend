@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { Database, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { LlmProvider } from '../types';
+import { LlmProvider, SupportedProviderConfig } from '../types';
 
 interface ProvidersTableProps {
   providers: LlmProvider[];
+  supportedProviders?: SupportedProviderConfig[];
   loading: boolean;
   onSave: (provider: Partial<LlmProvider>) => Promise<boolean>;
   onDelete: (id: number) => Promise<boolean>;
 }
 
 export const ProvidersTable: React.FC<ProvidersTableProps> = ({ 
-  providers, loading, onSave, onDelete 
+  providers, supportedProviders = [], loading, onSave, onDelete 
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
@@ -61,7 +62,21 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
               <tr className="editing-row">
                 <td>NEW</td>
                 <td>
-                  <input className="form-control sm" value={editName} onChange={e => setEditName(e.target.value)} placeholder="e.g. openai" />
+                  <select 
+                    className="form-control sm" 
+                    value={editName} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      setEditName(val);
+                      const matched = supportedProviders.find(sp => sp.name === val);
+                      if (matched && !editDisplayName) setEditDisplayName(matched.displayName);
+                    }}
+                  >
+                    <option value="" disabled>Select Provider</option>
+                    {supportedProviders.map(sp => (
+                      <option key={sp.name} value={sp.name}>{sp.name}</option>
+                    ))}
+                  </select>
                 </td>
                 <td>
                   <input className="form-control sm" value={editDisplayName} onChange={e => setEditDisplayName(e.target.value)} placeholder="e.g. OpenAI" />
@@ -80,7 +95,23 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
                 <td style={{ color: "#64748b" }}>#{p.id}</td>
                 {editingId === p.id ? (
                   <>
-                    <td><input className="form-control sm" value={editName} onChange={e => setEditName(e.target.value)} /></td>
+                    <td>
+                      <select 
+                        className="form-control sm" 
+                        value={editName} 
+                        onChange={e => {
+                          const val = e.target.value;
+                          setEditName(val);
+                          const matched = supportedProviders.find(sp => sp.name === val);
+                          if (matched) setEditDisplayName(matched.displayName);
+                        }}
+                      >
+                        <option value="" disabled>Select Provider</option>
+                        {supportedProviders.map(sp => (
+                          <option key={sp.name} value={sp.name}>{sp.name}</option>
+                        ))}
+                      </select>
+                    </td>
                     <td><input className="form-control sm" value={editDisplayName} onChange={e => setEditDisplayName(e.target.value)} /></td>
                   </>
                 ) : (

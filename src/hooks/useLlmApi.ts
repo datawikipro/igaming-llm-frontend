@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LlmGatewayNode, LlmProvider, LlmModel } from '../types';
+import { LlmGatewayNode, LlmProvider, LlmModel, SupportedProviderConfig } from '../types';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:62001";
 
@@ -7,6 +7,7 @@ export function useLlmApi() {
   const [nodes, setNodes] = useState<LlmGatewayNode[]>([]);
   const [providers, setProviders] = useState<LlmProvider[]>([]);
   const [models, setModels] = useState<LlmModel[]>([]);
+  const [supportedProviders, setSupportedProviders] = useState<SupportedProviderConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -56,11 +57,23 @@ export function useLlmApi() {
     return [];
   }, []);
 
+  const fetchSupportedProviders = useCallback(async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/v1/admin/providers/supported`);
+      if (res.ok) {
+        const data = await res.json();
+        setSupportedProviders(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch supported providers:", e);
+    }
+  }, []);
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchNodes(), fetchProviders(), fetchModels()]);
+    await Promise.all([fetchNodes(), fetchProviders(), fetchModels(), fetchSupportedProviders()]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders]);
 
   // Node CRUD
   const createNode = async (payload: LlmGatewayNode) => {
@@ -192,6 +205,7 @@ export function useLlmApi() {
     nodes,
     providers,
     models,
+    supportedProviders,
     loading,
     refreshing,
     fetchNodes,
@@ -204,6 +218,7 @@ export function useLlmApi() {
     saveProvider,
     deleteProvider,
     saveModel,
-    deleteModel
+    deleteModel,
+    fetchSupportedProviders
   };
 }

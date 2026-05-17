@@ -30,3 +30,9 @@ export interface LlmModel {
   active: boolean;
   provider?: LlmProvider;
 }
+
+export interface SupportedProviderConfig {
+  name: string;
+  displayName: string;
+  models: string[];
+}
