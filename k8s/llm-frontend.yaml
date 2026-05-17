@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: igaming-llm-frontend
-  namespace: igaming-llm
+  name: llm-frontend
+  namespace: llm
   labels:
-    app: igaming-llm-frontend
+    app: llm-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: igaming-llm-frontend
+      app: llm-frontend
   template:
     metadata:
       labels:
-        app: igaming-llm-frontend
+        app: llm-frontend
     spec:
       imagePullSecrets:
       - name: regcred
@@ -34,11 +34,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: igaming-llm-frontend
-  namespace: igaming-llm
+  name: llm-frontend
+  namespace: llm
 spec:
   selector:
-    app: igaming-llm-frontend
+    app: llm-frontend
   ports:
   - protocol: TCP
     port: 80
