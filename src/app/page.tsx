@@ -71,10 +71,12 @@ export default function Home() {
             <RotateCw size={16} className={refreshing ? "spin" : ""} />
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={16} />
-            {activeTab === "nodes" ? "Add Lease" : activeTab === "providers" ? "Add Provider" : "Add Model"}
-          </button>
+          {activeTab === "nodes" && (
+            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+              <Plus size={16} />
+              Add Lease
+            </button>
+          )}
         </div>
       </header>
 
