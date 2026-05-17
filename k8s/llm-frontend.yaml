@@ -29,7 +29,7 @@ spec:
         - name: HOSTNAME
           value: "0.0.0.0"
       nodeSelector:
-        node-type: main
+        node-type: master
 ---
 apiVersion: v1
 kind: Service
