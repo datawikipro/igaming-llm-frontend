@@ -44,12 +44,19 @@ async function handleProxy(request: NextRequest) {
 
     const responseHeaders = new Headers();
     res.headers.forEach((value, key) => {
-      if (key.toLowerCase() !== 'content-encoding') {
+      const lowerKey = key.toLowerCase();
+      if (
+        lowerKey !== 'content-encoding' &&
+        lowerKey !== 'content-length' &&
+        lowerKey !== 'transfer-encoding'
+      ) {
         responseHeaders.set(key, value);
       }
     });
 
-    return new NextResponse(res.body, {
+    const textData = await res.text();
+
+    return new NextResponse(textData, {
       status: res.status,
       headers: responseHeaders,
     });
