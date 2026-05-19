@@ -3,6 +3,7 @@ import { useNodes } from './useNodes';
 import { useProviders } from './useProviders';
 import { useModels } from './useModels';
 import { useQueueStats } from './useQueueStats';
+import { useQueueLinks } from './useQueueLinks';
 
 export function useLlmApi() {
   const [refreshing, setRefreshing] = useState(false);
@@ -41,6 +42,14 @@ export function useLlmApi() {
     fetchStats: fetchQueueStats
   } = useQueueStats();
 
+  const {
+    links: queueLinks,
+    loading: queueLinksLoading,
+    fetchLinks: fetchQueueLinks,
+    saveLink: saveQueueLink,
+    deleteLink: deleteQueueLink
+  } = useQueueLinks();
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -48,10 +57,11 @@ export function useLlmApi() {
       fetchProviders(),
       fetchModels(),
       fetchSupportedProviders(),
-      fetchQueueStats()
+      fetchQueueStats(),
+      fetchQueueLinks()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks]);
 
   return {
     nodes,
@@ -77,6 +87,12 @@ export function useLlmApi() {
     deleteKey,
     queueStats,
     queueStatsLoading,
-    fetchQueueStats
+    fetchQueueStats,
+    queueLinks,
+    queueLinksLoading,
+    fetchQueueLinks,
+    saveQueueLink,
+    deleteQueueLink
   };
 }
+

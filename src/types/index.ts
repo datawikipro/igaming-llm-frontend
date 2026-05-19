@@ -46,3 +46,14 @@ export interface SupportedProviderConfig {
   displayName: string;
   models: string[];
 }
+
+export interface LlmQueueLink {
+  id?: number;
+  sourceProvider: string;
+  sourceModel: string;
+  targetProvider: string;
+  targetModel: string;
+  active: boolean;
+  createdAt?: string;
+}
+

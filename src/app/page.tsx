@@ -40,7 +40,12 @@ export default function Home() {
     deleteKey,
     queueStats,
     queueStatsLoading,
-    fetchQueueStats
+    fetchQueueStats,
+    queueLinks,
+    queueLinksLoading,
+    fetchQueueLinks,
+    saveQueueLink,
+    deleteQueueLink
   } = useLlmApi();
 
   useEffect(() => {
@@ -49,14 +54,16 @@ export default function Home() {
     fetchModels();
     fetchSupportedProviders();
     fetchQueueStats();
+    fetchQueueLinks();
     
-    // Poll nodes status & queue every 10 seconds
+    // Poll nodes status, queue & links every 10 seconds
     const interval = setInterval(() => {
       fetchNodes();
       fetchQueueStats();
+      fetchQueueLinks();
     }, 10000);
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks]);
 
   return (
     <main className="dashboard-container">
@@ -154,6 +161,11 @@ export default function Home() {
           stats={queueStats} 
           loading={queueStatsLoading} 
           onRefresh={fetchQueueStats} 
+          links={queueLinks}
+          linksLoading={queueLinksLoading}
+          onRefreshLinks={fetchQueueLinks}
+          onSaveLink={saveQueueLink}
+          onDeleteLink={deleteQueueLink}
         />
       )}
 
