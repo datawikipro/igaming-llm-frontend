@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, RotateCw, LayoutDashboard, Database, Cpu, Activity } from "lucide-react";
+import { Plus, RotateCw, LayoutDashboard, Database, Cpu, Activity, AlertTriangle } from "lucide-react";
 import { useLlmApi } from "../hooks/useLlmApi";
 import { StatsGrid } from "../components/StatsGrid";
 import { NodesTable } from "../components/NodesTable";
@@ -9,8 +9,9 @@ import { RegisterNodeModal } from "../components/RegisterNodeModal";
 import { ProvidersTable } from "../components/ProvidersTable";
 import { ModelsTable } from "../components/ModelsTable";
 import { QueueStatsView } from "../components/QueueStatsView";
+import { UnmappedOddsView } from "../components/UnmappedOddsView";
 
-type TabType = "nodes" | "providers" | "models" | "queue";
+type TabType = "nodes" | "providers" | "models" | "queue" | "odds";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("nodes");
@@ -45,7 +46,11 @@ export default function Home() {
     queueLinksLoading,
     fetchQueueLinks,
     saveQueueLink,
-    deleteQueueLink
+    deleteQueueLink,
+    unmappedOdds,
+    unmappedOddsLoading,
+    fetchUnmappedOdds,
+    exportUnmappedOdds
   } = useLlmApi();
 
   useEffect(() => {
@@ -55,15 +60,17 @@ export default function Home() {
     fetchSupportedProviders();
     fetchQueueStats();
     fetchQueueLinks();
+    fetchUnmappedOdds();
     
-    // Poll nodes status, queue & links every 10 seconds
+    // Poll nodes status, queue, links & unmapped every 10 seconds
     const interval = setInterval(() => {
       fetchNodes();
       fetchQueueStats();
       fetchQueueLinks();
+      fetchUnmappedOdds();
     }, 10000);
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
 
   return (
     <main className="dashboard-container">
@@ -117,6 +124,13 @@ export default function Home() {
           <Activity size={18} />
           Gateway Queue
         </button>
+        <button 
+          className={`tab-btn ${activeTab === "odds" ? "active" : ""}`}
+          onClick={() => setActiveTab("odds")}
+        >
+          <AlertTriangle size={18} />
+          Unmapped ODDS
+        </button>
       </div>
 
       {activeTab === "nodes" && (
@@ -166,6 +180,15 @@ export default function Home() {
           onRefreshLinks={fetchQueueLinks}
           onSaveLink={saveQueueLink}
           onDeleteLink={deleteQueueLink}
+        />
+      )}
+
+      {activeTab === "odds" && (
+        <UnmappedOddsView 
+          unmappedOdds={unmappedOdds} 
+          loading={unmappedOddsLoading} 
+          onRefresh={fetchUnmappedOdds} 
+          onExport={exportUnmappedOdds}
         />
       )}
 

@@ -4,6 +4,7 @@ import { useProviders } from './useProviders';
 import { useModels } from './useModels';
 import { useQueueStats } from './useQueueStats';
 import { useQueueLinks } from './useQueueLinks';
+import { useUnmappedOdds } from './useUnmappedOdds';
 
 export function useLlmApi() {
   const [refreshing, setRefreshing] = useState(false);
@@ -50,6 +51,13 @@ export function useLlmApi() {
     deleteLink: deleteQueueLink
   } = useQueueLinks();
 
+  const {
+    unmappedOdds,
+    loading: unmappedOddsLoading,
+    fetchUnmappedOdds,
+    exportUnmappedOdds
+  } = useUnmappedOdds();
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -58,10 +66,11 @@ export function useLlmApi() {
       fetchModels(),
       fetchSupportedProviders(),
       fetchQueueStats(),
-      fetchQueueLinks()
+      fetchQueueLinks(),
+      fetchUnmappedOdds()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
 
   return {
     nodes,
@@ -92,7 +101,11 @@ export function useLlmApi() {
     queueLinksLoading,
     fetchQueueLinks,
     saveQueueLink,
-    deleteQueueLink
+    deleteQueueLink,
+    unmappedOdds,
+    unmappedOddsLoading,
+    fetchUnmappedOdds,
+    exportUnmappedOdds
   };
 }
 
