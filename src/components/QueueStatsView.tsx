@@ -149,7 +149,9 @@ export const QueueStatsView: React.FC<QueueStatsViewProps> = ({
                         <span className="badge-model" style={{ marginRight: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           {s.modelName}
                           {isLinked && (
-                            <Link2 size={12} style={{ color: '#a855f7' }} title="This queue is linked (shared worker resources)" />
+                            <span title="This queue is linked (shared worker resources)">
+                              <Link2 size={12} style={{ color: '#a855f7' }} />
+                            </span>
                           )}
                         </span>
                       </td>
