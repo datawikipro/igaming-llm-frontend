@@ -76,6 +76,7 @@ export default function Home() {
     exportUnmappedOdds
   } = useLlmApi();
 
+  // Initial load on mount
   useEffect(() => {
     fetchNodes();
     fetchProviders();
@@ -84,16 +85,23 @@ export default function Home() {
     fetchQueueStats();
     fetchQueueLinks();
     fetchUnmappedOdds();
-    
-    // Poll nodes status, queue, links & unmapped every 10 seconds
-    const interval = setInterval(() => {
-      fetchNodes();
-      fetchQueueStats();
-      fetchQueueLinks();
-      fetchUnmappedOdds();
-    }, 10000);
-    return () => clearInterval(interval);
   }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
+
+  // Tab-specific background polling
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (activeTab === "nodes") {
+        fetchNodes();
+      } else if (activeTab === "queue") {
+        fetchQueueStats();
+        fetchQueueLinks();
+      } else if (activeTab === "odds") {
+        fetchUnmappedOdds();
+      }
+    }, activeTab === "odds" ? 20000 : 10000); // 20s for heavy unmapped odds, 10s for other status
+
+    return () => clearInterval(interval);
+  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
 
   return (
     <main className="dashboard-container">
