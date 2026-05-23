@@ -30,7 +30,7 @@ async function handleProxy(request: NextRequest) {
   });
 
   let body: any = undefined;
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
+  if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
     body = await request.blob();
   }
 
