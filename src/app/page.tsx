@@ -16,6 +16,28 @@ type TabType = "nodes" | "providers" | "models" | "queue" | "odds";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("nodes");
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "") as TabType;
+      const validTabs: TabType[] = ["nodes", "providers", "models", "queue", "odds"];
+      if (validTabs.includes(hash)) {
+        setActiveTab(hash);
+      } else {
+        setActiveTab("nodes");
+        window.location.hash = "nodes";
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+  };
   
   const {
     nodes,
@@ -98,35 +120,35 @@ export default function Home() {
       <div className="tabs-container">
         <button 
           className={`tab-btn ${activeTab === "nodes" ? "active" : ""}`}
-          onClick={() => setActiveTab("nodes")}
+          onClick={() => handleTabChange("nodes")}
         >
           <LayoutDashboard size={18} />
           Active Leases
         </button>
         <button 
           className={`tab-btn ${activeTab === "providers" ? "active" : ""}`}
-          onClick={() => setActiveTab("providers")}
+          onClick={() => handleTabChange("providers")}
         >
           <Database size={18} />
           Providers
         </button>
         <button 
           className={`tab-btn ${activeTab === "models" ? "active" : ""}`}
-          onClick={() => setActiveTab("models")}
+          onClick={() => handleTabChange("models")}
         >
           <Cpu size={18} />
           Models
         </button>
         <button 
           className={`tab-btn ${activeTab === "queue" ? "active" : ""}`}
-          onClick={() => setActiveTab("queue")}
+          onClick={() => handleTabChange("queue")}
         >
           <Activity size={18} />
           Gateway Queue
         </button>
         <button 
           className={`tab-btn ${activeTab === "odds" ? "active" : ""}`}
-          onClick={() => setActiveTab("odds")}
+          onClick={() => handleTabChange("odds")}
         >
           <AlertTriangle size={18} />
           Unmapped ODDS
