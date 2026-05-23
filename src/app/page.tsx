@@ -76,16 +76,25 @@ export default function Home() {
     exportUnmappedOdds
   } = useLlmApi();
 
-  // Initial load on mount
+  // Lazy load data dynamically when the active tab changes (or on mount for the default tab)
   useEffect(() => {
-    fetchNodes();
-    fetchProviders();
-    fetchModels();
-    fetchSupportedProviders();
-    fetchQueueStats();
-    fetchQueueLinks();
-    fetchUnmappedOdds();
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
+    if (activeTab === "nodes") {
+      fetchNodes();
+      fetchProviders();
+      fetchModels();
+    } else if (activeTab === "providers") {
+      fetchProviders();
+      fetchSupportedProviders();
+    } else if (activeTab === "models") {
+      fetchModels();
+      fetchProviders();
+    } else if (activeTab === "queue") {
+      fetchQueueStats();
+      fetchQueueLinks();
+    } else if (activeTab === "odds") {
+      fetchUnmappedOdds();
+    }
+  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
 
   // Tab-specific background polling
   useEffect(() => {
