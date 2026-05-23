@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-ingress-nginx-config
+  namespace: llm
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        sendfile        on;
+        keepalive_timeout  65;
+
+        # Logging
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        access_log /var/log/nginx/access.log main;
+        error_log /var/log/nginx/error.log warn;
+
+        server {
+            listen 80;
+            server_name llm-admin.smartbet.guru.local llm.smartbet.guru.local localhost 100.86.137.112;
+
+            location / {
+                proxy_pass http://llm-frontend.llm.svc.cluster.local:80;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+
+                # WebSockets support (for hot reload or ws if needed)
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: local-ingress-nginx
+  namespace: llm
+  labels:
+    app: local-ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: local-ingress-nginx
+  template:
+    metadata:
+      labels:
+        app: local-ingress-nginx
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        node-type: master
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: config-volume
+        configMap:
+          name: local-ingress-nginx-config
