@@ -33,6 +33,7 @@ export function useLlmApi() {
   const {
     models,
     fetchModels,
+    fetchModelNodes,
     saveModel,
     deleteModel
   } = useModels();
@@ -91,6 +92,7 @@ export function useLlmApi() {
     deleteProvider,
     saveModel,
     deleteModel,
+    fetchModelNodes,
     fetchKeys,
     addKey,
     deleteKey,

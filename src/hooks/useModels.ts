@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LlmModel } from '../types';
+import { LlmModel, LlmGatewayNode } from '../types';
 import { apiFetch } from '../utils/api';
 
 export function useModels() {
@@ -15,6 +15,11 @@ export function useModels() {
       return data;
     }
     return [];
+  }, []);
+
+  const fetchModelNodes = useCallback(async (modelId: number): Promise<LlmGatewayNode[]> => {
+    const data = await apiFetch<LlmGatewayNode[]>(`/api/v1/admin/models/${modelId}/nodes`);
+    return data ?? [];
   }, []);
 
   const saveModel = async (model: Partial<LlmModel>, providerId: number) => {
@@ -49,6 +54,7 @@ export function useModels() {
   return {
     models,
     fetchModels,
+    fetchModelNodes,
     saveModel,
     deleteModel
   };

@@ -58,6 +58,7 @@ export default function Home() {
     deleteProvider,
     saveModel,
     deleteModel,
+    fetchModelNodes,
     fetchKeys,
     addKey,
     deleteKey,
@@ -188,7 +189,8 @@ export default function Home() {
           supportedProviders={supportedProviders}
           loading={loading} 
           onSave={saveModel} 
-          onDelete={deleteModel} 
+          onDelete={deleteModel}
+          onFetchModelNodes={fetchModelNodes}
         />
       )}
 

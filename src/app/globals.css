@@ -355,7 +355,8 @@ body {
   animation: fadeIn 0.2s ease-out;
 }
 
-.modal {
+.modal,
+.modal-content {
   background: #0f172a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -379,16 +380,28 @@ body {
   color: white;
 }
 
-.close-btn {
+.close-btn,
+.modal-close {
   background: transparent;
   border: none;
   color: #64748b;
   cursor: pointer;
   transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
 }
 
-.close-btn:hover {
+.close-btn:hover,
+.modal-close:hover {
   color: white;
+  background: rgba(255,255,255,0.05);
+}
+
+.modal-body {
+  padding: 0;
 }
 
 .form-group {
