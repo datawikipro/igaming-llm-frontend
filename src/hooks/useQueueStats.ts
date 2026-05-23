@@ -2,7 +2,9 @@ import { useState, useCallback } from 'react';
 import { apiFetch } from '../utils/api';
 
 export interface ModelQueueStats {
+  modelId: number | null;
   modelName: string;
+  displayName: string | null;
   providerType: string;
   pendingCount: number;
   processingCount: number;

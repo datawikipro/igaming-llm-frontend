@@ -144,16 +144,21 @@ export const QueueStatsView: React.FC<QueueStatsViewProps> = ({
                   );
 
                   return (
-                    <tr key={`${s.modelName}-${s.providerType}`}>
+                    <tr key={s.modelId != null ? `${s.modelId}-${s.providerType}` : `${s.modelName}-${s.providerType}`}>
                       <td style={{ fontWeight: 700, color: "#f8fafc" }}>
                         <span className="badge-model" style={{ marginRight: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          {s.modelName}
+                          {s.displayName || s.modelName}
                           {isLinked && (
                             <span title="This queue is linked (shared worker resources)">
                               <Link2 size={12} style={{ color: '#a855f7' }} />
                             </span>
                           )}
                         </span>
+                        {s.displayName && s.displayName !== s.modelName && (
+                          <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '2px' }}>
+                            {s.modelName}
+                          </span>
+                        )}
                       </td>
                       <td style={{ textTransform: "capitalize", color: "#94a3b8" }}>
                         {s.providerType}

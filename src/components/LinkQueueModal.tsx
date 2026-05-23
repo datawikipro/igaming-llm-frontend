@@ -69,8 +69,8 @@ export const LinkQueueModal: React.FC<LinkQueueModalProps> = ({ onClose, activeQ
             >
               <option value="" disabled>Select Source Queue</option>
               {activeQueues.map((q, idx) => (
-                <option key={`${q.modelName}-${q.providerType}`} value={idx}>
-                  {q.modelName} ({q.providerType}) — {q.pendingCount} pending
+                <option key={q.modelId != null ? `${q.modelId}-${q.providerType}` : `${q.modelName}-${q.providerType}`} value={idx}>
+                  {q.displayName || q.modelName} ({q.providerType}) — {q.pendingCount} pending
                 </option>
               ))}
             </select>
