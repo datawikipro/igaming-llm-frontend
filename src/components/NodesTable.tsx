@@ -73,11 +73,17 @@ export const NodesTable: React.FC<NodesTableProps> = ({
                     </span>
                   </td>
                   <td>
-                    {node.suspendedUntil ? (
-                      <span style={{ fontSize: "0.75rem", color: "#f59e0b" }}>
-                        Until {new Date(node.suspendedUntil).toLocaleTimeString()}
-                      </span>
-                    ) : (
+                    {node.suspendedUntil ? (() => {
+                      const diffMs = new Date(node.suspendedUntil).getTime() - Date.now();
+                      if (diffMs <= 0) return <span style={{ fontSize: "0.75rem", color: "#10b981" }}>Resetting...</span>;
+                      const diffHours = Math.floor(diffMs / 3600000);
+                      const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                      return (
+                        <span style={{ fontSize: "0.75rem", color: "#f59e0b", fontWeight: 600 }} title={`Until ${new Date(node.suspendedUntil).toLocaleTimeString()}`}>
+                          Resets in {diffHours > 0 ? `${diffHours}h ` : ""}{diffMins}m
+                        </span>
+                      );
+                    })() : (
                       <span style={{ fontSize: "0.75rem", color: "#64748b" }}>—</span>
                     )}
                   </td>
