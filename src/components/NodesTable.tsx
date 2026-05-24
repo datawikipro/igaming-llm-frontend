@@ -45,6 +45,7 @@ export const NodesTable: React.FC<NodesTableProps> = ({
                 <th>Endpoint URL</th>
                 <th>Status</th>
                 <th>Suspension</th>
+                <th>Leased By Pod</th>
                 <th>Stats (S/F)</th>
                 <th>Tokens</th>
                 <th style={{ textAlign: "right" }}>Actions</th>
@@ -85,6 +86,15 @@ export const NodesTable: React.FC<NodesTableProps> = ({
                       );
                     })() : (
                       <span style={{ fontSize: "0.75rem", color: "#64748b" }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ fontFamily: "monospace", fontSize: "0.75rem" }}>
+                    {node.leasedByPod ? (
+                      <span style={{ color: "#38bdf8", background: "rgba(56,189,248,0.08)", padding: "2px 6px", borderRadius: "4px", display: "inline-block", maxWidth: "180px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={node.leasedByPod}>
+                        {node.leasedByPod}
+                      </span>
+                    ) : (
+                      <span style={{ color: "#64748b" }}>—</span>
                     )}
                   </td>
                   <td style={{ fontSize: "0.85rem" }}>
