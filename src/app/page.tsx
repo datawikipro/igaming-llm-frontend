@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, RotateCw, LayoutDashboard, Database, Cpu, Activity, AlertTriangle } from "lucide-react";
+import { Plus, RotateCw, LayoutDashboard, Database, Cpu, Activity, AlertTriangle, GitFork } from "lucide-react";
 import { useLlmApi } from "../hooks/useLlmApi";
 import { StatsGrid } from "../components/StatsGrid";
 import { NodesTable } from "../components/NodesTable";
@@ -10,8 +10,9 @@ import { ProvidersTable } from "../components/ProvidersTable";
 import { ModelsTable } from "../components/ModelsTable";
 import { QueueStatsView } from "../components/QueueStatsView";
 import { UnmappedOddsView } from "../components/UnmappedOddsView";
+import { RoutingRulesTable } from "../components/RoutingRulesTable";
 
-type TabType = "nodes" | "providers" | "models" | "queue" | "odds";
+type TabType = "nodes" | "providers" | "models" | "queue" | "odds" | "rules";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("nodes");
@@ -20,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "") as TabType;
-      const validTabs: TabType[] = ["nodes", "providers", "models", "queue", "odds"];
+      const validTabs: TabType[] = ["nodes", "providers", "models", "queue", "odds", "rules"];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else {
@@ -70,6 +71,11 @@ export default function Home() {
     fetchQueueLinks,
     saveQueueLink,
     deleteQueueLink,
+    routingRules,
+    routingRulesLoading,
+    fetchRoutingRules,
+    saveRoutingRule,
+    deleteRoutingRule,
     unmappedOdds,
     unmappedOddsLoading,
     fetchUnmappedOdds,
@@ -93,8 +99,11 @@ export default function Home() {
       fetchQueueLinks();
     } else if (activeTab === "odds") {
       fetchUnmappedOdds();
+    } else if (activeTab === "rules") {
+      fetchRoutingRules();
+      fetchModels();
     }
-  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
+  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
 
   // Tab-specific background polling
   useEffect(() => {
@@ -106,11 +115,13 @@ export default function Home() {
         fetchQueueLinks();
       } else if (activeTab === "odds") {
         fetchUnmappedOdds();
+      } else if (activeTab === "rules") {
+        fetchRoutingRules();
       }
     }, activeTab === "odds" ? 20000 : 10000); // 20s for heavy unmapped odds, 10s for other status
 
     return () => clearInterval(interval);
-  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
+  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
 
   return (
     <main className="dashboard-container">
@@ -171,6 +182,13 @@ export default function Home() {
           <AlertTriangle size={18} />
           Unmapped ODDS
         </button>
+        <button 
+          className={`tab-btn ${activeTab === "rules" ? "active" : ""}`}
+          onClick={() => handleTabChange("rules")}
+        >
+          <GitFork size={18} />
+          Routing Rules
+        </button>
       </div>
 
       {activeTab === "nodes" && (
@@ -230,6 +248,16 @@ export default function Home() {
           loading={unmappedOddsLoading} 
           onRefresh={fetchUnmappedOdds} 
           onExport={exportUnmappedOdds}
+        />
+      )}
+
+      {activeTab === "rules" && (
+        <RoutingRulesTable 
+          rules={routingRules}
+          models={models}
+          loading={routingRulesLoading}
+          onSave={saveRoutingRule}
+          onDelete={deleteRoutingRule}
         />
       )}
 

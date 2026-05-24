@@ -57,3 +57,14 @@ export interface LlmQueueLink {
   createdAt?: string;
 }
 
+export interface LlmRoutingRule {
+  id?: number;
+  logicalType: string;
+  googleRequired: boolean | null;
+  urgency: string | null;
+  targetModel: LlmModel;
+  active: boolean;
+  createdAt?: string;
+}
+
+

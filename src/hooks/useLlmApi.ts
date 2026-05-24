@@ -5,6 +5,7 @@ import { useModels } from './useModels';
 import { useQueueStats } from './useQueueStats';
 import { useQueueLinks } from './useQueueLinks';
 import { useUnmappedOdds } from './useUnmappedOdds';
+import { useRoutingRules } from './useRoutingRules';
 
 export function useLlmApi() {
   const [refreshing, setRefreshing] = useState(false);
@@ -59,6 +60,14 @@ export function useLlmApi() {
     exportUnmappedOdds
   } = useUnmappedOdds();
 
+  const {
+    rules: routingRules,
+    loading: routingRulesLoading,
+    fetchRules: fetchRoutingRules,
+    saveRule: saveRoutingRule,
+    deleteRule: deleteRoutingRule
+  } = useRoutingRules();
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -68,10 +77,11 @@ export function useLlmApi() {
       fetchSupportedProviders(),
       fetchQueueStats(),
       fetchQueueLinks(),
+      fetchRoutingRules(),
       fetchUnmappedOdds()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchUnmappedOdds]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
 
   return {
     nodes,
@@ -104,6 +114,11 @@ export function useLlmApi() {
     fetchQueueLinks,
     saveQueueLink,
     deleteQueueLink,
+    routingRules,
+    routingRulesLoading,
+    fetchRoutingRules,
+    saveRoutingRule,
+    deleteRoutingRule,
     unmappedOdds,
     unmappedOddsLoading,
     fetchUnmappedOdds,
