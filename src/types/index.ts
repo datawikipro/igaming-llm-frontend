@@ -7,7 +7,7 @@ export interface LlmGatewayNode {
   apiKey?: string;
   model?: LlmModel;
   active: boolean;
-  status: 'HEALTHY' | 'DOWN' | 'EXHAUSTED';
+  status: 'IDLE' | 'STARTED' | 'HEALTHY' | 'EXHAUSTED' | 'DOWN';
   suspendedUntil: string | null;
   leasedByPod?: string | null;
   leasedAt?: string | null;

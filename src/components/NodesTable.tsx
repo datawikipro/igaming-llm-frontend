@@ -107,7 +107,7 @@ export const NodesTable: React.FC<NodesTableProps> = ({
                   </td>
                   <td style={{ textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: "8px" }}>
-                      {node.status !== "HEALTHY" && (
+                      {(node.status === 'EXHAUSTED' || node.status === 'DOWN') && (
                         <button 
                           className="btn btn-action btn-reset" 
                           title="Reset Suspension Lock"
