@@ -53,6 +53,68 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
     }
   };
 
+  const getStatusBadge = (k: LlmProviderKey) => {
+    if (!k.active) {
+      return (
+        <span style={{ 
+          padding: '2px 6px', 
+          borderRadius: '4px', 
+          fontSize: '0.75rem', 
+          background: 'rgba(239, 68, 68, 0.15)', 
+          color: '#ef4444', 
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px'
+        }}>
+          🚫 Блок возраста / Неактивен
+        </span>
+      );
+    }
+    
+    if (k.suspendedUntil) {
+      const suspendedTime = new Date(k.suspendedUntil).getTime();
+      const now = new Date().getTime();
+      if (suspendedTime > now) {
+        const timeLeftMin = Math.round((suspendedTime - now) / 60000);
+        const timeLeftHours = Math.floor(timeLeftMin / 60);
+        const timeLeftMins = timeLeftMin % 60;
+        const timeLeftStr = timeLeftHours > 0 ? `${timeLeftHours}ч ${timeLeftMins}м` : `${timeLeftMin}м`;
+        return (
+          <span style={{ 
+            padding: '2px 6px', 
+            borderRadius: '4px', 
+            fontSize: '0.75rem', 
+            background: 'rgba(245, 158, 11, 0.15)', 
+            color: '#f59e0b', 
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            ⏳ Превышен лимит (до {new Date(k.suspendedUntil).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ост. {timeLeftStr})
+          </span>
+        );
+      }
+    }
+
+    return (
+      <span style={{ 
+        padding: '2px 6px', 
+        borderRadius: '4px', 
+        fontSize: '0.75rem', 
+        background: 'rgba(16, 185, 129, 0.15)', 
+        color: '#10b981', 
+        border: '1px solid rgba(16, 185, 129, 0.3)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px'
+      }}>
+        ✅ Активен
+      </span>
+    );
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#94a3b8', margin: 0 }}>
@@ -71,8 +133,9 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
             <table className="sub-table" style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#64748b' }}>
-                  <th style={{ textAlign: 'left', padding: '6px' }}>Label</th>
+                  <th style={{ textAlign: 'left', padding: '6px' }}>Label / Email</th>
                   <th style={{ textAlign: 'left', padding: '6px' }}>API Key / Token (Secret)</th>
+                  <th style={{ textAlign: 'left', padding: '6px' }}>Status</th>
                   <th style={{ textAlign: 'right', padding: '6px' }}>Actions</th>
                 </tr>
               </thead>
@@ -83,6 +146,7 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
                     <td style={{ padding: '6px', color: '#64748b', fontFamily: 'monospace' }}>
                       {k.apiKey && k.apiKey.length > 10 ? `${k.apiKey.substring(0, 10)}... (masked)` : k.apiKey}
                     </td>
+                    <td style={{ padding: '6px' }}>{getStatusBadge(k)}</td>
                     <td style={{ padding: '6px', textAlign: 'right' }}>
                       <button 
                         className="btn btn-action btn-delete btn-sm" 
