@@ -166,6 +166,7 @@ export const ProvidersTable: React.FC<ProvidersTableProps> = ({
                   <td colSpan={5} style={{ padding: '1rem 2rem', backgroundColor: 'rgba(255, 255, 255, 0.02)' }}>
                     <ProviderKeysManager 
                       providerId={p.id}
+                      providerName={p.name}
                       fetchKeys={fetchKeys}
                       addKey={addKey}
                       deleteKey={deleteKey}
