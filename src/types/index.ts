@@ -28,7 +28,6 @@ export interface LlmProviderKey {
   label: string;
   apiKey: string;
   active: boolean;
-  suspendedUntil?: string | null;
   modelSuspensions?: LlmKeyModelSuspension[];
   createdAt?: string;
 }

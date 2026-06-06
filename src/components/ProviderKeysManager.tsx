@@ -127,7 +127,7 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
       return new Date(s.suspendedUntil).getTime() > Date.now();
     });
 
-    if (activeSuspensions.length > 0 || (k.suspendedUntil && new Date(k.suspendedUntil).getTime() > Date.now())) {
+    if (activeSuspensions.length > 0) {
       const items = activeSuspensions.map(s => {
         const suspendedTime = new Date(s.suspendedUntil).getTime();
         const now = new Date().getTime();
@@ -141,20 +141,6 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
           timeLeftStr
         };
       });
-
-      if (k.suspendedUntil && new Date(k.suspendedUntil).getTime() > Date.now()) {
-        const suspendedTime = new Date(k.suspendedUntil).getTime();
-        const now = new Date().getTime();
-        const timeLeftMin = Math.round((suspendedTime - now) / 60000);
-        const timeLeftHours = Math.floor(timeLeftMin / 60);
-        const timeLeftMins = timeLeftMin % 60;
-        const timeLeftStr = timeLeftHours > 0 ? `${timeLeftHours}ч ${timeLeftMins}м` : `${timeLeftMin}м`;
-        items.push({
-          label: 'Все модели',
-          timeStr: new Date(k.suspendedUntil).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-          timeLeftStr
-        });
-      }
 
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
