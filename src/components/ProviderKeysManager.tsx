@@ -123,30 +123,59 @@ export const ProviderKeysManager: React.FC<ProviderKeysManagerProps> = ({
       );
     }
     
-    if (k.suspendedUntil) {
-      const suspendedTime = new Date(k.suspendedUntil).getTime();
-      const now = new Date().getTime();
-      if (suspendedTime > now) {
+    const activeSuspensions = (k.modelSuspensions || []).filter(s => {
+      return new Date(s.suspendedUntil).getTime() > Date.now();
+    });
+
+    if (activeSuspensions.length > 0 || (k.suspendedUntil && new Date(k.suspendedUntil).getTime() > Date.now())) {
+      const items = activeSuspensions.map(s => {
+        const suspendedTime = new Date(s.suspendedUntil).getTime();
+        const now = new Date().getTime();
         const timeLeftMin = Math.round((suspendedTime - now) / 60000);
         const timeLeftHours = Math.floor(timeLeftMin / 60);
         const timeLeftMins = timeLeftMin % 60;
         const timeLeftStr = timeLeftHours > 0 ? `${timeLeftHours}ч ${timeLeftMins}м` : `${timeLeftMin}м`;
-        return (
-          <span style={{ 
-            padding: '2px 6px', 
-            borderRadius: '4px', 
-            fontSize: '0.75rem', 
-            background: 'rgba(245, 158, 11, 0.15)', 
-            color: '#f59e0b', 
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            ⏳ Превышен лимит (до {new Date(k.suspendedUntil).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ост. {timeLeftStr})
-          </span>
-        );
+        return {
+          label: s.modelName,
+          timeStr: new Date(s.suspendedUntil).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          timeLeftStr
+        };
+      });
+
+      if (k.suspendedUntil && new Date(k.suspendedUntil).getTime() > Date.now()) {
+        const suspendedTime = new Date(k.suspendedUntil).getTime();
+        const now = new Date().getTime();
+        const timeLeftMin = Math.round((suspendedTime - now) / 60000);
+        const timeLeftHours = Math.floor(timeLeftMin / 60);
+        const timeLeftMins = timeLeftMin % 60;
+        const timeLeftStr = timeLeftHours > 0 ? `${timeLeftHours}ч ${timeLeftMins}м` : `${timeLeftMin}м`;
+        items.push({
+          label: 'Все модели',
+          timeStr: new Date(k.suspendedUntil).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          timeLeftStr
+        });
       }
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {items.map((item, idx) => (
+            <span key={idx} style={{ 
+              padding: '2px 6px', 
+              borderRadius: '4px', 
+              fontSize: '0.75rem', 
+              background: 'rgba(245, 158, 11, 0.15)', 
+              color: '#f59e0b', 
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              whiteSpace: 'nowrap'
+            }}>
+              ⏳ {item.label}: Лимит (до {item.timeStr}, ост. {item.timeLeftStr})
+            </span>
+          ))}
+        </div>
+      );
     }
 
     return (

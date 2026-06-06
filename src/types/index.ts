@@ -17,12 +17,19 @@ export interface LlmGatewayNode {
   lastRequestTime: string | null;
 }
 
+export interface LlmKeyModelSuspension {
+  id?: number;
+  modelName: string;
+  suspendedUntil: string;
+}
+
 export interface LlmProviderKey {
   id?: number;
   label: string;
   apiKey: string;
   active: boolean;
   suspendedUntil?: string | null;
+  modelSuspensions?: LlmKeyModelSuspension[];
   createdAt?: string;
 }
 
