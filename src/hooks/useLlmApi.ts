@@ -6,6 +6,7 @@ import { useQueueStats } from './useQueueStats';
 import { useQueueLinks } from './useQueueLinks';
 import { useUnmappedOdds } from './useUnmappedOdds';
 import { useRoutingRules } from './useRoutingRules';
+import { useQueueSubscriptions } from './useQueueSubscriptions';
 
 export function useLlmApi() {
   const [refreshing, setRefreshing] = useState(false);
@@ -68,6 +69,14 @@ export function useLlmApi() {
     deleteRule: deleteRoutingRule
   } = useRoutingRules();
 
+  const {
+    subscriptions: queueSubscriptions,
+    loading: queueSubscriptionsLoading,
+    fetchSubscriptions: fetchQueueSubscriptions,
+    saveSubscription: saveQueueSubscription,
+    deleteSubscription: deleteQueueSubscription
+  } = useQueueSubscriptions();
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -78,10 +87,11 @@ export function useLlmApi() {
       fetchQueueStats(),
       fetchQueueLinks(),
       fetchRoutingRules(),
-      fetchUnmappedOdds()
+      fetchUnmappedOdds(),
+      fetchQueueSubscriptions()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
 
   return {
     nodes,
@@ -122,7 +132,12 @@ export function useLlmApi() {
     unmappedOdds,
     unmappedOddsLoading,
     fetchUnmappedOdds,
-    exportUnmappedOdds
+    exportUnmappedOdds,
+    queueSubscriptions,
+    queueSubscriptionsLoading,
+    fetchQueueSubscriptions,
+    saveQueueSubscription,
+    deleteQueueSubscription
   };
 }
 

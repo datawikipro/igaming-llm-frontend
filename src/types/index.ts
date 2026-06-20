@@ -74,4 +74,13 @@ export interface LlmRoutingRule {
   createdAt?: string;
 }
 
+export interface LlmQueueSubscription {
+  id?: number;
+  queueName: string;
+  model: LlmModel;
+  priority?: number;
+  active: boolean;
+  createdAt?: string;
+}
+
 

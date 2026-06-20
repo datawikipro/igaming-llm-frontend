@@ -79,7 +79,12 @@ export default function Home() {
     unmappedOdds,
     unmappedOddsLoading,
     fetchUnmappedOdds,
-    exportUnmappedOdds
+    exportUnmappedOdds,
+    queueSubscriptions,
+    queueSubscriptionsLoading,
+    fetchQueueSubscriptions,
+    saveQueueSubscription,
+    deleteQueueSubscription
   } = useLlmApi();
 
   // Lazy load data dynamically when the active tab changes (or on mount for the default tab)
@@ -97,13 +102,15 @@ export default function Home() {
     } else if (activeTab === "queue") {
       fetchQueueStats();
       fetchQueueLinks();
+      fetchQueueSubscriptions();
+      fetchModels();
     } else if (activeTab === "odds") {
       fetchUnmappedOdds();
     } else if (activeTab === "rules") {
       fetchRoutingRules();
       fetchModels();
     }
-  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
+  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
 
   // Tab-specific background polling
   useEffect(() => {
@@ -113,15 +120,16 @@ export default function Home() {
       } else if (activeTab === "queue") {
         fetchQueueStats();
         fetchQueueLinks();
+        fetchQueueSubscriptions();
       } else if (activeTab === "odds") {
         fetchUnmappedOdds();
       } else if (activeTab === "rules") {
         fetchRoutingRules();
       }
-    }, activeTab === "odds" ? 20000 : 10000); // 20s for heavy unmapped odds, 10s for other status
+    }, 10000);
 
     return () => clearInterval(interval);
-  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds]);
+  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
 
   return (
     <main className="dashboard-container">
@@ -239,6 +247,12 @@ export default function Home() {
           onRefreshLinks={fetchQueueLinks}
           onSaveLink={saveQueueLink}
           onDeleteLink={deleteQueueLink}
+          subscriptions={queueSubscriptions}
+          subscriptionsLoading={queueSubscriptionsLoading}
+          onRefreshSubscriptions={fetchQueueSubscriptions}
+          onSaveSubscription={saveQueueSubscription}
+          onDeleteSubscription={deleteQueueSubscription}
+          models={models}
         />
       )}
 
