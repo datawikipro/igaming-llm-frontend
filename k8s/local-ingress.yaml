@@ -24,7 +24,7 @@ data:
 
         server {
             listen 80;
-            server_name llm-admin.smartbet.guru.local llm.smartbet.guru.local localhost 100.86.137.112;
+            server_name llm-admin.smartbet.guru.local llm.smartbet.guru.local localhost 100.89.122.84;
 
             location / {
                 proxy_pass http://llm-frontend.llm.svc.cluster.local:80;
