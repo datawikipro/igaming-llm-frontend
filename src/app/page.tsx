@@ -9,10 +9,10 @@ import { RegisterNodeModal } from "../components/RegisterNodeModal";
 import { ProvidersTable } from "../components/ProvidersTable";
 import { ModelsTable } from "../components/ModelsTable";
 import { QueueStatsView } from "../components/QueueStatsView";
-import { UnmappedOddsView } from "../components/UnmappedOddsView";
+
 import { RoutingRulesTable } from "../components/RoutingRulesTable";
 
-type TabType = "nodes" | "providers" | "models" | "queue" | "odds" | "rules";
+type TabType = "nodes" | "providers" | "models" | "queue" | "rules";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("nodes");
@@ -21,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "") as TabType;
-      const validTabs: TabType[] = ["nodes", "providers", "models", "queue", "odds", "rules"];
+      const validTabs: TabType[] = ["nodes", "providers", "models", "queue", "rules"];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else {
@@ -59,6 +59,7 @@ export default function Home() {
     deleteProvider,
     saveModel,
     deleteModel,
+    syncModels,
     fetchModelNodes,
     fetchKeys,
     addKey,
@@ -76,10 +77,7 @@ export default function Home() {
     fetchRoutingRules,
     saveRoutingRule,
     deleteRoutingRule,
-    unmappedOdds,
-    unmappedOddsLoading,
-    fetchUnmappedOdds,
-    exportUnmappedOdds,
+
     queueSubscriptions,
     queueSubscriptionsLoading,
     fetchQueueSubscriptions,
@@ -104,13 +102,11 @@ export default function Home() {
       fetchQueueLinks();
       fetchQueueSubscriptions();
       fetchModels();
-    } else if (activeTab === "odds") {
-      fetchUnmappedOdds();
     } else if (activeTab === "rules") {
       fetchRoutingRules();
       fetchModels();
     }
-  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
+  }, [activeTab, fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchQueueSubscriptions]);
 
   // Tab-specific background polling
   useEffect(() => {
@@ -121,15 +117,13 @@ export default function Home() {
         fetchQueueStats();
         fetchQueueLinks();
         fetchQueueSubscriptions();
-      } else if (activeTab === "odds") {
-        fetchUnmappedOdds();
       } else if (activeTab === "rules") {
         fetchRoutingRules();
       }
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
+  }, [activeTab, fetchNodes, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchQueueSubscriptions]);
 
   return (
     <main className="dashboard-container">
@@ -183,13 +177,7 @@ export default function Home() {
           <Activity size={18} />
           Gateway Queue
         </button>
-        <button 
-          className={`tab-btn ${activeTab === "odds" ? "active" : ""}`}
-          onClick={() => handleTabChange("odds")}
-        >
-          <AlertTriangle size={18} />
-          Unmapped ODDS
-        </button>
+
         <button 
           className={`tab-btn ${activeTab === "rules" ? "active" : ""}`}
           onClick={() => handleTabChange("rules")}
@@ -234,6 +222,7 @@ export default function Home() {
           onSave={saveModel} 
           onDelete={deleteModel}
           onFetchModelNodes={fetchModelNodes}
+          onSync={syncModels}
         />
       )}
 
@@ -256,14 +245,7 @@ export default function Home() {
         />
       )}
 
-      {activeTab === "odds" && (
-        <UnmappedOddsView 
-          unmappedOdds={unmappedOdds} 
-          loading={unmappedOddsLoading} 
-          onRefresh={fetchUnmappedOdds} 
-          onExport={exportUnmappedOdds}
-        />
-      )}
+
 
       {activeTab === "rules" && (
         <RoutingRulesTable 

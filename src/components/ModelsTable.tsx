@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Cpu, Plus, Trash2, Edit2, Check, X, RefreshCw } from 'lucide-react';
 import { LlmModel, LlmProvider, SupportedProviderConfig, LlmGatewayNode } from '../types';
 import { ConfirmDeleteModelModal } from './ConfirmDeleteModelModal';
 
@@ -11,16 +11,37 @@ interface ModelsTableProps {
   onSave: (model: Partial<LlmModel>, providerId: number) => Promise<boolean>;
   onDelete: (id: number) => Promise<boolean>;
   onFetchModelNodes: (modelId: number) => Promise<LlmGatewayNode[]>;
+  onSync?: () => Promise<any>;
 }
 
 export const ModelsTable: React.FC<ModelsTableProps> = ({ 
-  models, providers, supportedProviders = [], loading, onSave, onDelete, onFetchModelNodes
+  models, providers, supportedProviders = [], loading, onSave, onDelete, onFetchModelNodes, onSync
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editModelId, setEditModelId] = useState("");
   const [editDisplayName, setEditDisplayName] = useState("");
   const [selectedProviderId, setSelectedProviderId] = useState<number>(providers[0]?.id || 0);
   const [isAdding, setIsAdding] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+
+  const handleSync = async () => {
+    if (!onSync) return;
+    setIsSyncing(true);
+    setSyncStatus(null);
+    try {
+      const res = await onSync();
+      if (res) {
+        setSyncStatus(`Synced: ${res.totalModels} models (+${res.addedModels})`);
+        setTimeout(() => setSyncStatus(null), 6000);
+      }
+    } catch (e: any) {
+      setSyncStatus("Sync failed");
+      setTimeout(() => setSyncStatus(null), 5000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // Confirm-delete modal state
   const [confirmModel, setConfirmModel] = useState<LlmModel | null>(null);
@@ -80,9 +101,27 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
             <Cpu size={20} />
             Supported Models
           </h2>
-          <button className="btn btn-primary btn-sm" onClick={() => setIsAdding(true)}>
-            <Plus size={14} /> Add Model
-          </button>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            {syncStatus && (
+              <span className="status-badge status-healthy" style={{ fontSize: "11px" }}>
+                {syncStatus}
+              </span>
+            )}
+            {onSync && (
+              <button 
+                className="btn btn-secondary btn-sm" 
+                onClick={handleSync}
+                disabled={isSyncing}
+                title="Sync models from official provider APIs"
+              >
+                <RefreshCw size={14} className={isSyncing ? "spin" : ""} />
+                {isSyncing ? "Syncing..." : "Sync from APIs"}
+              </button>
+            )}
+            <button className="btn btn-primary btn-sm" onClick={() => setIsAdding(true)}>
+              <Plus size={14} /> Add Model
+            </button>
+          </div>
         </div>
 
         <div className="nodes-table-container">

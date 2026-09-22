@@ -4,7 +4,7 @@ import { useProviders } from './useProviders';
 import { useModels } from './useModels';
 import { useQueueStats } from './useQueueStats';
 import { useQueueLinks } from './useQueueLinks';
-import { useUnmappedOdds } from './useUnmappedOdds';
+
 import { useRoutingRules } from './useRoutingRules';
 import { useQueueSubscriptions } from './useQueueSubscriptions';
 
@@ -37,7 +37,8 @@ export function useLlmApi() {
     fetchModels,
     fetchModelNodes,
     saveModel,
-    deleteModel
+    deleteModel,
+    syncModels
   } = useModels();
 
   const {
@@ -54,12 +55,7 @@ export function useLlmApi() {
     deleteLink: deleteQueueLink
   } = useQueueLinks();
 
-  const {
-    unmappedOdds,
-    loading: unmappedOddsLoading,
-    fetchUnmappedOdds,
-    exportUnmappedOdds
-  } = useUnmappedOdds();
+
 
   const {
     rules: routingRules,
@@ -87,11 +83,10 @@ export function useLlmApi() {
       fetchQueueStats(),
       fetchQueueLinks(),
       fetchRoutingRules(),
-      fetchUnmappedOdds(),
       fetchQueueSubscriptions()
     ]);
     setRefreshing(false);
-  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchUnmappedOdds, fetchQueueSubscriptions]);
+  }, [fetchNodes, fetchProviders, fetchModels, fetchSupportedProviders, fetchQueueStats, fetchQueueLinks, fetchRoutingRules, fetchQueueSubscriptions]);
 
   return {
     nodes,
@@ -112,6 +107,7 @@ export function useLlmApi() {
     deleteProvider,
     saveModel,
     deleteModel,
+    syncModels,
     fetchModelNodes,
     fetchKeys,
     addKey,
@@ -129,10 +125,7 @@ export function useLlmApi() {
     fetchRoutingRules,
     saveRoutingRule,
     deleteRoutingRule,
-    unmappedOdds,
-    unmappedOddsLoading,
-    fetchUnmappedOdds,
-    exportUnmappedOdds,
+
     queueSubscriptions,
     queueSubscriptionsLoading,
     fetchQueueSubscriptions,

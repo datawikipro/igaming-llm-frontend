@@ -51,11 +51,23 @@ export function useModels() {
     return false;
   };
 
+  const syncModels = async () => {
+    const data = await apiFetch<any>('/api/v1/admin/models/sync', {
+      method: "POST"
+    });
+    if (data !== null) {
+      await fetchModels();
+      return data;
+    }
+    return null;
+  };
+
   return {
     models,
     fetchModels,
     fetchModelNodes,
     saveModel,
-    deleteModel
+    deleteModel,
+    syncModels
   };
 }
