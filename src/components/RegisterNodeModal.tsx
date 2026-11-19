@@ -60,7 +60,7 @@ export const RegisterNodeModal: React.FC<RegisterNodeModalProps> = ({ onClose, c
     e.preventDefault();
     
     let parsedName = `node-${providerType}-${Math.random().toString(36).substring(2, 9)}`;
-    let parsedEndpoint = "http://igaming-llm-gateway:62002";
+    let parsedEndpoint = "http://llm-gateway:80";
 
     if (jsonConfig.trim()) {
       try {
